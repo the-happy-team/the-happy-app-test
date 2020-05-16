@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Happy!</title>
+  </head>
+  <body>
+    <!--You can change the dimensions of the camera with height and weight, (text align and margin is just for center the image)-->
+
+    <!--TODO: Get best resolution for each camera.-->
+    <div id="camdemo" style="width: 1280px; height: 720px; text-align: center; margin: 0 auto;"></div>
+    <div style="text-align:center;">
+      <input type="button" id="start" value="Ligar/Desligar Câmera"/>
+      <input type="button" id="startrecording" value="Iniciar/Pausar o Happy"/>
+    </div>
+
+    <script>
+      // A flag to know when start or stop the camera
+      let enabled = true;
+      // Use require to add webcamjs
+      const WebCamera = require("webcamjs");
+      WebCamera.attach('#camdemo');
+
+      document.getElementById("start").addEventListener('click', function () {
+        if (!enabled) { // Start the camera !
+          enabled = true;
+          WebCamera.attach('#camdemo');
+          console.log("The camera has been started");
+        } else { // Disable the camera !
+          enabled = false;
+          WebCamera.reset();
+          console.log("The camera has been disabled");
+        }
+      }, false);
+      // return an object with the processed base64image
+      function processBase64Image(dataString) {
+        const matches = dataString.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/), response = {};
+
+        if (matches.length !== 3) {
+          return new Error('Invalid input string');
+        }
+
+        response.type = matches[1];
+        response.data = new Buffer(matches[2], 'base64');
+
+        return response;
+      }
+
+
+      // Create global variable directory
+      let directory = '';
+      // Get directory to work
+      const $ = require("jquery");
+      $('input[type=file]').change(function () {
+        setDirectory($('#directory').val());
+      });
+
+      // Function to keep track of the directory
+      function setDirectory(dir){
+        console.log("Setting direcory to" + dir);
+        directory = dir;
+      }
+
+      function getDirectory() {
+        return directory;
+      }
+    </script>
+
+    <script>
+      let fs = require('fs'); // Load the File System to execute our common tasks (CRUD)
+      let fs_jetpack = require('fs-jetpack');
+      let moment = require('moment');
+
+
+      // Get date to organize the files
+      function getDate() {
+        moment.locale('pt-br');
+        fulldate = moment().format('L');
+        fullhour = moment().format('LT');
+        obj = {
+          "fulldate": fulldate.replace(/\//g,'-'),
+          "fullhour": fullhour.replace(':','h'),
+        };
+        return obj;
+      }
+
+      function wdirectoryScreencapture() {
+        // get today's date
+        obj = getDate();
+        chosenPath = "/Users/MariNagem/Documents/2018/DOCUMENTS/Projetos\\ em\\ desenvolvimento/Felicidades\\ em\\ Berlin/happy-app";
+        obj.imageDir = chosenPath + '/' +  obj.fulldate + '/';
+        obj.imagePath = obj.imageDir + '' + obj.fullhour;
+
+        // Ensures that directory on given path exists and meets given criteria. If any criterium is not met it will be after this call.
+        fs_jetpack.dir(obj.imageDir);
+
+        return obj;
+      }
+
+      function wdirectoryCam() {
+        // get today's date
+        obj = getDate();
+        chosenPath = "/Users/MariNagem/Documents/2018/DOCUMENTS/Projetos em desenvolvimento/Felicidades em Berlin/happy-app";
+        obj.imageDir = chosenPath + '/' +  obj.fulldate + '/';
+        obj.imagePath = obj.imageDir + '' + obj.fullhour;
+
+        // Ensures that directory on given path exists and meets given criteria. If any criterium is not met it will be after this call.
+        fs_jetpack.dir(obj.imageDir);
+
+        return obj;
+      }
+
+      // Cam related function
+      function savePicture(imageBuffer) {
+        obj = wdirectoryCam();
+
+        fs.writeFile(obj.imagePath + '.png', imageBuffer['data'], 'binary', function(err) {
+          if(err)
+            console.log(err);
+          else
+            console.log("The file was saved!");
+        })
+      }
+
+      function takeAndSavePicture() {
+        if (enabled) {
+          WebCamera.snap(function (data_uri) {
+            // Save the image in a variable
+            const imageBuffer = processBase64Image(data_uri);
+            // Save file to the correct location
+            savePicture(imageBuffer);
+          })
+
+        } else {
+          console.log("Please enable the camera first to take the snapshot !");
+        }
+      }
+
+    </script>
+
+    <script>
+
+      let shell = require("shelljs");
+      function screenShot() {
+        obj = wdirectoryScreencapture();
+        let screenshotdir = obj.fullhour + "_screenshot" + ".png";
+        shell.exec("cd " + obj.imageDir + " &&" + " screencapture " +  screenshotdir , function(){});
+        console.log("cd " + obj.imageDir + " &&" + " screencapture -x " +  screenshotdir);
+        console.log(screenshotdir);
+      }
+
+    </script>
+
+
+    <script>
+      let record = true;
+      count = 0;
+      function loop() {
+        takeAndSavePicture();
+        screenShot();
+        console.log("Loop " + count);
+        count += 1;
+      }
+
+      $("#startrecording").click( function() {
+        if(record){
+          let id = setInterval(function(){ loop() }, 6000);
+          console.log("O Happy iniciou! \\o/");
+        }else {
+          clearInterval(id);
+        }
+      })
+    </script>
+  </body>
+</html>
