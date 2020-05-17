@@ -1,28 +1,15 @@
-const WebCamera = require('webcamjs');
 const fs = require('fs');
 const fs_jetpack = require('fs-jetpack');
 const moment = require('moment');
-const path = require('path');
 const shell = require('shelljs');
 const archiver = require('archiver');
-const faceapi = require('face-api.js');
 const elerem = require('electron').remote;
 const dialog = elerem.dialog;
 const app = elerem.app;
 
-const camDiv = document.getElementById('camdemo');
+const camDiv = document.getElementById('my-cam');
+const canvasDiv = document.getElementById('my-snapshot');
 const saveButton = document.getElementById('save-button');
-
-// await faceapi.loadFaceExpressionModel('/models');
-
-faceapi.env.monkeyPatch({
-  Canvas: HTMLCanvasElement,
-  Image: HTMLImageElement,
-  ImageData: ImageData,
-  Video: HTMLVideoElement,
-  createCanvasElement: () => document.createElement('canvas'),
-  createImageElement: () => document.createElement('img')
-});
 
 const mDate = {
   fulldate: moment().format('YYYY-MM-DD'),
@@ -33,15 +20,6 @@ const defaultSavePath = path.resolve(app.getPath('desktop'), `${mDate.fulldate}.
 let appRecord = false;
 let loopID = 0;
 let count = 0;
-
-WebCamera.set({
-  dest_width: 1280,
-  dest_height: 720,
-  width: 640,
-  height: 360,
-  image_format: 'png'
-});
-WebCamera.attach('#camdemo');
 
 function processBase64Image(dataString) {
   const matches = dataString.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
@@ -75,9 +53,10 @@ function savePicture(imageBuffer) {
 }
 
 function takeAndSavePicture() {
-  WebCamera.snap(function(data_uri) {
-    savePicture(processBase64Image(data_uri));
-  });
+  canvasDiv.width = camDiv.videoWidth;
+  canvasDiv.height = camDiv.videoHeight;
+  canvasDiv.getContext('2d').drawImage(camDiv, 0, 0);
+  savePicture(processBase64Image(canvasDiv.toDataURL('image/png')));
 }
 
 function takeAndSaveScreenShot() {
@@ -90,7 +69,6 @@ function loop() {
   takeAndSaveScreenShot();
   console.log(`Loop ${count++}`);
 }
-
 
 document.getElementById('start-button').addEventListener('click', function() {
   appRecord = !appRecord;

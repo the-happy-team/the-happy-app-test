@@ -8,11 +8,15 @@
     <link rel="stylesheet" href="./css/main.css">
   </head>
   <body>
-    <div id="camdemo"></div>
+    <div id="my-cam-container" class="cam-container">
+      <video id="my-cam" class="cam" autoplay muted playsinline></video>
+      <canvas id="my-snapshot" class="snapshot"></canvas>
+    </div>
     <div class="button-container">
-      <div class="my-button" id="start-button">Iniciar</div>
-      <div class="my-button hide" id="save-button">Baixar</div>
+      <div id="start-button" class="button" >Iniciar</div>
+      <div id="save-button" class="button hide" >Baixar</div>
     </div>
   </body>
+  <script type="text/javascript" src="./js/camera.js"></script>
   <script type="text/javascript" src="./js/index.js"></script>
 </html>

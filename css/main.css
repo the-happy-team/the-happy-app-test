@@ -1,7 +1,15 @@
-#camdemo {
-  text-align: center;
+.snapshot {
+  position: absolute;
+  left: -2048px;
+}
+
+.cam-container {
   margin: 0 auto;
-  transition: all .15s linear;
+  text-align: center;
+}
+
+.cam {
+    transition: opacity .15s linear;
 }
 
 .button-container {
@@ -9,7 +17,7 @@
   text-align: center;
 }
 
-.my-button {
+.button {
   display: inline-block;
   padding: 16px 24px;
   border: 1px solid #222;
@@ -25,11 +33,11 @@
   user-select: none;
 }
 
-.my-button:hover {
+.button:hover {
   color: #000;
   background-color: #ddd;
 }
 
-.my-button.hide {
+.button.hide {
   display: none;
 }
