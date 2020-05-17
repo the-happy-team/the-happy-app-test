@@ -1,0 +1,29 @@
+language: node_js
+node_js:
+  - 12
+
+branches:
+  only:
+    - master
+
+notifications:
+  email: false
+
+before_script:
+  - npm install
+
+script:
+  - npm run pack
+
+before_deploy:
+  - tar -czvf Happy-darwin-x64.tar.gz Happy-darwin-x64
+
+deploy:
+  provider: releases
+  api_key: $GHTOKEN
+  file: "Happy-darwin-x64.tar.gz"
+  body: "$TRAVIS_BRANCH: $TRAVIS_COMMIT_MESSAGE"
+  target_commitish: $TRAVIS_COMMIT
+  skip_cleanup: true
+  on:
+    all_branches: true
