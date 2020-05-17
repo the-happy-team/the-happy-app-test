@@ -1,0 +1,35 @@
+#camdemo {
+  text-align: center;
+  margin: 0 auto;
+  transition: all .15s linear;
+}
+
+.button-container {
+  margin: 24px auto;
+  text-align: center;
+}
+
+.my-button {
+  display: inline-block;
+  padding: 16px 24px;
+  border: 1px solid #222;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #222;
+  background-color: #fff;
+  text-transform: uppercase;
+  font-family: sans-serif;
+  font-weight: 100;
+  letter-spacing: .2em;
+  transition: all .15s linear;
+  user-select: none;
+}
+
+.my-button:hover {
+  color: #000;
+  background-color: #ddd;
+}
+
+.my-button.hide {
+  display: none;
+}

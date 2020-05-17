@@ -3,43 +3,13 @@
   <head>
     <meta charset="UTF-8">
     <title>The Happy APP!</title>
-    <style>
-      #camdemo {
-        text-align: center;
-        margin: 0 auto;
-        transition: all .15s linear;
-      }
-
-      .button-container {
-        margin: 24px auto;
-        text-align: center;
-      }
-
-      .my-button {
-        display: inline-block;
-        padding: 16px 24px;
-        border: 1px solid #222;
-        border-radius: 8px;
-        cursor: pointer;
-        color: #222;
-        background-color: #fff;
-        text-transform: uppercase;
-        font-family: sans-serif;
-        font-weight: 100;
-        letter-spacing: .2em;
-        transition: all .15s linear;
-      }
-
-      .my-button:hover {
-        color: #000;
-        background-color: #ddd;
-      }
-    </style>
+    <link rel="stylesheet" href="./main.css">
   </head>
   <body>
     <div id="camdemo"></div>
     <div class="button-container">
-      <div class="my-button" id="startrecording">Iniciar</div>
+      <div class="my-button" id="start-button">Iniciar</div>
+      <div class="my-button hide" id="save-button">Baixar</div>
     </div>
 
     <script>
@@ -49,8 +19,19 @@
       const moment = require('moment');
       const path = require('path');
       const shell = require('shelljs');
+      const archiver = require('archiver');
+      const elerem = require('electron').remote;
+      const dialog = elerem.dialog;
+      const app = elerem.app;
 
       const camDiv = document.getElementById('camdemo');
+      const saveButton = document.getElementById('save-button');
+
+      const mDate = {
+        fulldate: moment().format('YYYY-MM-DD'),
+        imageDir: path.join(__dirname, moment().format('YYYY-MM-DD'))
+      };
+      const defaultSavePath = path.resolve(app.getPath('desktop'), `${mDate.fulldate}.zip`);
 
       let appRecord = false;
       let loopID = 0;
@@ -79,21 +60,18 @@
       }
 
       function wDirectory() {
-        obj = {};
-        obj.fulldate = moment().format('YYYY-MM-DD');
-        obj.fullhour = moment().format('HHmmss');
-        obj.imageDir = path.join(__dirname, obj.fulldate);
-        obj.imagePath = path.join(obj.imageDir, obj.fullhour);
+        mDate.datetime = moment().format('YYYYMMDD_HHmmss');
+        mDate.imagePath = path.join(mDate.imageDir, mDate.datetime);
 
         // Ensures that directory on given path exists and meets given criteria.
         // If any criterium is not met it will be after this call.
-        fs_jetpack.dir(obj.imageDir);
+        fs_jetpack.dir(mDate.imageDir);
 
-        return obj;
+        return mDate;
       }
 
       function savePicture(imageBuffer) {
-        obj = wDirectory();
+        const obj = wDirectory();
         fs.writeFile(`${obj.imagePath}_camera.png`, imageBuffer.data, 'binary', function(err) {
           if(err) console.log(err);
         });
@@ -106,8 +84,8 @@
       }
 
       function takeAndSaveScreenShot() {
-        obj = wDirectory();
-        shell.exec(`cd ${obj.imageDir} && screencapture ${obj.fullhour}_screen.png`, function(){});
+        const obj = wDirectory();
+        shell.exec(`cd ${obj.imageDir} && screencapture ${obj.datetime}_screen.png`, function(){});
       }
 
       function loop() {
@@ -116,9 +94,11 @@
         console.log(`Loop ${count++}`);
       }
 
-      document.getElementById('startrecording').addEventListener('click', function() {
+
+      document.getElementById('start-button').addEventListener('click', function() {
         appRecord = !appRecord;
         camDiv.style.opacity = appRecord ? '1' : '0';
+        saveButton.style.display = appRecord ? 'none' : 'inline-block';
         this.innerHTML = appRecord ? 'Pausar' : 'Iniciar';
 
         if(appRecord) {
@@ -127,6 +107,16 @@
         } else {
           clearInterval(loopID);
         }
+      }, false);
+
+      document.getElementById('save-button').addEventListener('click', function() {
+        const userChosenPath = dialog.showSaveDialog({ defaultPath: defaultSavePath }) || `${mDate.imageDir}.zip`;
+        const output = fs.createWriteStream(userChosenPath);
+        const archive = archiver('zip', { zlib: { level: 9 } });
+
+        archive.pipe(output);
+        archive.directory(mDate.imageDir, mDate.fulldate);
+        archive.finalize();
       }, false);
     </script>
   </body>
