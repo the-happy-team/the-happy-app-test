@@ -1,3 +1,5 @@
 .DS_S*
 node_modules
-*darwin*.zip
+*_screen.png
+*_camera.png
+Happy-darwin-x64*
