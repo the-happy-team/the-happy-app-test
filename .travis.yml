@@ -16,7 +16,7 @@ script:
   - npm run pack
 
 before_deploy:
-  - tar -czvf Happy-darwin-x64.tar.gz Happy-darwin-x64
+  - tar -czf Happy-darwin-x64.tar.gz Happy-darwin-x64
 
 deploy:
   provider: releases
