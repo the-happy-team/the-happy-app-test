@@ -1,7 +1,7 @@
 const fs = require('fs');
 const fs_jetpack = require('fs-jetpack');
 const moment = require('moment');
-const shell = require('shelljs');
+const screenshot = require('screenshot-desktop');
 const archiver = require('archiver');
 const elerem = require('electron').remote;
 const dialog = elerem.dialog;
@@ -61,7 +61,10 @@ function takeAndSavePicture() {
 
 function takeAndSaveScreenShot() {
   const obj = wDirectory();
-  shell.exec(`cd ${obj.imageDir} && screencapture -mxS -D1 ${obj.datetime}_screen.png`, function(){});
+  screenshot({
+    format: 'png',
+    filename: path.join(obj.imageDir, `${obj.datetime}_screen.png`)
+  });
 }
 
 function loop() {
