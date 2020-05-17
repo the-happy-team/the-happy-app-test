@@ -61,7 +61,7 @@ function takeAndSavePicture() {
 
 function takeAndSaveScreenShot() {
   const obj = wDirectory();
-  shell.exec(`cd ${obj.imageDir} && screencapture ${obj.datetime}_screen.png`, function(){});
+  shell.exec(`cd ${obj.imageDir} && screencapture -mxS -D1 ${obj.datetime}_screen.png`, function(){});
 }
 
 function loop() {
