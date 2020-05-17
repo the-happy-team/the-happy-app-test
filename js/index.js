@@ -78,7 +78,7 @@ document.getElementById('start-button').addEventListener('click', function() {
 
   if(appRecord) {
     loop();
-    loopID = setInterval(loop, 6000);
+    loopID = setInterval(loop, 60e3);
   } else {
     clearInterval(loopID);
   }
