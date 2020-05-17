@@ -8,7 +8,14 @@ let win;
 
 function createWindow () {
     // Create the browser window.
-    win = new BrowserWindow({width: 1280, height: 720, icon: __dirname + '/icon/256x256.png'});
+    win = new BrowserWindow({
+      width: 1280,
+      height: 720,
+      webPreferences: {
+        nodeIntegration: true
+      },
+      icon: path.join(__dirname, 'icons', '256x256.png')
+    });
 
     // and load the index.html of the app.
     win.loadURL(url.format({
