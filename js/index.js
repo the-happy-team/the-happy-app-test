@@ -1,11 +1,11 @@
+const archiver = require('archiver');
+const app = elerem.app;
+const dialog = elerem.dialog;
+const elerem = require('electron').remote;
 const fs = require('fs');
 const fs_jetpack = require('fs-jetpack');
 const moment = require('moment');
 const screenshot = require('screenshot-desktop');
-const archiver = require('archiver');
-const elerem = require('electron').remote;
-const dialog = elerem.dialog;
-const app = elerem.app;
 
 const camDiv = document.getElementById('my-cam');
 const canvasDiv = document.getElementById('my-snapshot');
