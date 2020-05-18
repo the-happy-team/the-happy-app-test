@@ -1,7 +1,14 @@
+const { getAppPath } = require('electron').remote.app;
 const electron = require('electron');
 const faceapi = require('face-api.js');
 const path = require('path');
-//const ipcRenderer = electron.ipcRenderer;
+
+const { setupCanvases, updateCanvases, saveCanvases } = require('./ioUtils');
+
+const CAM = {
+  WIDTH: 1280,
+  HEIGHT: 720
+};
 
 const faceapiOptions = new faceapi.SsdMobilenetv1Options({
   minConfidence: 0.6,
@@ -9,17 +16,6 @@ const faceapiOptions = new faceapi.SsdMobilenetv1Options({
 });
 
 let cam;
-let isRunning = true;
-let isReady = false;
-
-const snapshotCanvas = document.getElementById('my-snapshot');
-const snapshotCanvasCtx = snapshotCanvas.getContext('2d');
-
-const labeledCanvas = document.getElementById('my-labeled-snapshot');
-const labeledCanvasCtx = labeledCanvas.getContext('2d');
-
-const scaledOverlayCanvas = document.getElementById('my-scaled-overlay');
-const scaledOverlayCanvasCtx = scaledOverlayCanvas.getContext('2d');
 
 faceapi.env.monkeyPatch({
   Canvas: HTMLCanvasElement,
@@ -32,21 +28,14 @@ faceapi.env.monkeyPatch({
 
 const loadNet = async () => {
   const detectionNet = faceapi.nets.ssdMobilenetv1;
-  await detectionNet.load(path.join(__dirname, 'assets', 'weights'));
-  await faceapi.loadFaceExpressionModel(path.join(__dirname, 'assets', 'weights'));
+  await detectionNet.load(path.join(getAppPath(), 'assets', 'weights'));
+  await faceapi.loadFaceExpressionModel(path.join(getAppPath(), 'assets', 'weights'));
 };
 
 const initCamera = async (width, height) => {
   const video = document.getElementById('my-cam');
   video.width = width / 2;
   video.height = height / 2;
-
-  labeledCanvas.width = width;
-  labeledCanvas.height = height;
-  snapshotCanvas.width = width;
-  snapshotCanvas.height = height;
-  scaledOverlayCanvas.width = width / 2;
-  scaledOverlayCanvas.height = height / 2;
 
   const stream = await navigator.mediaDevices.getUserMedia({
     audio: false,
@@ -66,33 +55,31 @@ const initCamera = async (width, height) => {
 };
 
 const detectFace = async () => {
+  updateCanvases();
   const result = await faceapi.detectSingleFace(cam, faceapiOptions).withFaceExpressions();
 
   if(typeof result !== 'undefined') {
     const resultScaled = faceapi.resizeResults(result, { width: cam.width, height: cam.height });
 
+    saveCanvases(result, resultScaled, faceapi);
+
     const mExpression = Object.keys(result.expressions).reduce((a, b) => {
       return (result.expressions[a] > result.expressions[b]) ? a : b;
     });
 
-    labeledCanvasCtx.clearRect(0, 0, labeledCanvas.width, labeledCanvas.height);
-    labeledCanvasCtx.drawImage(cam, 0, 0);
-    faceapi.draw.drawDetections(labeledCanvas, result);
-    faceapi.draw.drawFaceExpressions(labeledCanvas, result);
-
-    scaledOverlayCanvasCtx.clearRect(0, 0, scaledOverlayCanvas.width, scaledOverlayCanvas.height);
-    faceapi.draw.drawDetections(scaledOverlayCanvas, resultScaled);
-    faceapi.draw.drawFaceExpressions(scaledOverlayCanvas, resultScaled);
+    window.loopID = setTimeout(detectFace, 60e3);
   } else {
-    setTimeout(detectFace, 1000);
+    window.loopID = setTimeout(detectFace, 1e3);
   }
 };
 
 loadNet().then(() => {
   console.log('Network has loaded');
-  return initCamera(1280, 720);
+  return initCamera(CAM.WIDTH, CAM.HEIGHT);
 }).then(video => {
   console.log('Camera was initialized');
+  setupCanvases(CAM.WIDTH, CAM.HEIGHT);
   cam = video;
-  detectFace();
 });
+
+module.exports = { detectFace };
