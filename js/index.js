@@ -1,13 +1,26 @@
 const { app, dialog } = require('electron').remote;
-const { createWriteStream } = require('fs');
+const { createWriteStream, writeFileSync } = require('fs');
 const { clearCanvases, getUris } = require('./js/ioUtils');
 const { detectFace } = require('./js/camera');
 
 const pathResolve = require('path').resolve;
+const pathJoin = require('path').join;
 const archiver = require('archiver');
 
 window.appRunning = false;
 window.loopID = 0;
+window.rawFeelings = {};
+window.feelings = {};
+
+function feelingsCsv(obj) {
+  let header = '';
+  let values = '';
+  Object.keys(obj).forEach((k) => {
+    header += k + ',';
+    values += obj[k] + ',';
+  });
+  return header + '\n' + values;
+}
 
 document.getElementById('start-button').addEventListener('click', function() {
   window.appRunning = !window.appRunning;
@@ -27,6 +40,15 @@ document.getElementById('start-button').addEventListener('click', function() {
 
 document.getElementById('save-button').addEventListener('click', function() {
   const outInfo = getUris();
+
+  writeFileSync(pathJoin(outInfo.outDirPath, '__feelings.csv'), feelingsCsv(window.feelings), (err) => {
+    if (err) throw err;
+  });
+
+  writeFileSync(pathJoin(outInfo.outDirPath, '__feelings-raw.csv'), feelingsCsv(window.rawFeelings), (err) => {
+    if (err) throw err;
+  });
+
   const defaultPath = pathResolve(app.getPath('desktop'), `${outInfo.outDirName}.zip`);
   const userChosenPath = dialog.showSaveDialogSync({ defaultPath: defaultPath }) || `${outInfo.outDirPath}.zip`;
 

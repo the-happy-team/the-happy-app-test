@@ -10,6 +10,11 @@ const CAM = {
   HEIGHT: 720
 };
 
+const DELAY = {
+  SHORT: 1e3,
+  LONG: 60e3
+};
+
 const faceapiOptions = new faceapi.SsdMobilenetv1Options({
   minConfidence: 0.6,
   maxResults: 100
@@ -64,12 +69,22 @@ const detectFace = async () => {
     saveCanvases(result, resultScaled, faceapi);
 
     const mExpression = Object.keys(result.expressions).reduce((a, b) => {
-      return (result.expressions[a] > result.expressions[b]) ? a : b;
-    });
+      if(!(b in window.rawFeelings)) {
+        window.rawFeelings[b] = 0;
+      }
+      window.rawFeelings[b] += result.expressions[b];
 
-    window.loopID = setTimeout(detectFace, 60e3);
+      return (result.expressions[a] > result.expressions[b]) ? a : b;
+    }, -1);
+
+    if(!(mExpression in window.feelings)) {
+      window.feelings[mExpression] = 0;
+    }
+    window.feelings[mExpression] += 1;
+
+    window.loopID = setTimeout(detectFace, DELAY.LONG);
   } else {
-    window.loopID = setTimeout(detectFace, 1e3);
+    window.loopID = setTimeout(detectFace, DELAY.SHORT);
   }
 };
 
