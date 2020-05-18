@@ -1,28 +1,28 @@
 const electron = require('electron');
-//const faceapi = require('face-api.js');
+const faceapi = require('face-api.js');
 const path = require('path');
 //const ipcRenderer = electron.ipcRenderer;
 
 const MIN_FACE_CONFIDENCE = 0.5;
-//const faceapiOptions = new faceapi.SsdMobilenetv1Options({ MIN_FACE_CONFIDENCE });
+const faceapiOptions = new faceapi.SsdMobilenetv1Options({ MIN_FACE_CONFIDENCE });
 
 let cam;
 let isRunning = true;
 let isReady = false;
 
-//faceapi.env.monkeyPatch({
-//  Canvas: HTMLCanvasElement,
-//  Image: HTMLImageElement,
-//  ImageData: ImageData,
-//  Video: HTMLVideoElement,
-//  createCanvasElement: () => document.createElement('canvas'),
-//  createImageElement: () => document.createElement('img')
-//});
+faceapi.env.monkeyPatch({
+  Canvas: HTMLCanvasElement,
+  Image: HTMLImageElement,
+  ImageData: ImageData,
+  Video: HTMLVideoElement,
+  createCanvasElement: () => document.createElement('canvas'),
+  createImageElement: () => document.createElement('img')
+});
 
 const loadNet = async () => {
-//  const detectionNet = faceapi.nets.ssdMobilenetv1;
-//  await detectionNet.load(path.join(__dirname, 'assets', 'weights'));
-//  await faceapi.loadFaceExpressionModel(path.join(__dirname, 'assets', 'weights'));
+  const detectionNet = faceapi.nets.ssdMobilenetv1;
+  await detectionNet.load(path.join(__dirname, 'assets', 'weights'));
+  await faceapi.loadFaceExpressionModel(path.join(__dirname, 'assets', 'weights'));
 };
 
 const initCamera = async (width, height) => {
