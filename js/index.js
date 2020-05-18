@@ -8,7 +8,7 @@ const moment = require('moment');
 const screenshot = require('screenshot-desktop');
 
 const camDiv = document.getElementById('my-cam');
-const canvasDiv = document.getElementById('my-snapshot');
+const mySnapshot = document.getElementById('my-snapshot');
 const saveButton = document.getElementById('save-button');
 
 const mDate = {
@@ -45,18 +45,13 @@ function wDirectory() {
   return mDate;
 }
 
-function savePicture(imageBuffer) {
+function savePicture(canvasDiv, label) {
+  canvasDiv.getContext('2d').drawImage(camDiv, 0, 0);
+  const imageBuffer = processBase64Image(canvasDiv.toDataURL('image/png'));
   const obj = wDirectory();
-  fs.writeFile(`${obj.imagePath}_camera.png`, imageBuffer.data, 'binary', function(err) {
+  fs.writeFile(`${obj.imagePath}_${label}.png`, imageBuffer.data, 'binary', function(err) {
     if(err) console.log(err);
   });
-}
-
-function takeAndSavePicture() {
-  canvasDiv.width = camDiv.videoWidth;
-  canvasDiv.height = camDiv.videoHeight;
-  canvasDiv.getContext('2d').drawImage(camDiv, 0, 0);
-  savePicture(processBase64Image(canvasDiv.toDataURL('image/png')));
 }
 
 function takeAndSaveScreenShot() {
@@ -68,7 +63,7 @@ function takeAndSaveScreenShot() {
 }
 
 function loop() {
-  takeAndSavePicture();
+  savePicture(mySnapshot, 'camera');
   takeAndSaveScreenShot();
   console.log(`Loop ${count++}`);
 }

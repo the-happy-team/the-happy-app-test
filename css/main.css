@@ -1,15 +1,24 @@
 .snapshot {
   position: absolute;
+  top: -2048px;
   left: -2048px;
 }
 
 .cam-container {
+  position: relative;
   margin: 0 auto;
   text-align: center;
 }
 
 .cam {
-    transition: opacity .15s linear;
+  transition: opacity .15s linear;
+}
+
+.overlay {
+  position: absolute;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
 }
 
 .button-container {
