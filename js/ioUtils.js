@@ -72,7 +72,7 @@ function saveScreenshot(detectionResult, outFilePath) {
       screenshotCanvas.height = mSreenShot.height / 2;
       screenshotCanvasCtx.drawImage(mSreenShot, 0, 0, screenshotCanvas.width, screenshotCanvas.height);
       drawCenteredFace(screenshotCanvas, screenshotCanvasCtx, detectionResult);
-      saveCanvas(screenshotCanvas, 'center', outFilePath);
+      saveCanvas(screenshotCanvas, 'scrcam', outFilePath);
     };
   });
 }
