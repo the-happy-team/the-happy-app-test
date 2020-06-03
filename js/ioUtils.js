@@ -22,11 +22,12 @@ function setupCanvases(width, height) {
 }
 
 const mDate = moment().format('YYYY-MM-DD');
+const outInfo = {};
 
-const outInfo = {
-  outDirName: mDate,
-  outDirPath: pathJoin(getAppPath(), mDate)
-};
+function setOutDir() {
+  outInfo.outDirName = mDate + '_' + parseInt(moment().format('x')).toString(32);
+  outInfo.outDirPath = pathJoin(getAppPath(), outInfo.outDirName);
+}
 
 function getUris() {
   outInfo.outFileName = moment().format('YYYYMMDD_HHmmss');
@@ -92,4 +93,4 @@ function clearCanvases() {
   scaledOverlayCanvasCtx.clearRect(0, 0, scaledOverlayCanvas.width, scaledOverlayCanvas.height);
 }
 
-module.exports = { setupCanvases, updateCanvases, saveCanvases, clearCanvases, getUris };
+module.exports = { setupCanvases, updateCanvases, saveCanvases, clearCanvases, setOutDir, getUris };
