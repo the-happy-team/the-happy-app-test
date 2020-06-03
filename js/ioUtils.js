@@ -9,6 +9,9 @@ const screenshot = require('screenshot-desktop');
 const snapshotCanvas = document.getElementById('my-snapshot');
 const snapshotCanvasCtx = snapshotCanvas.getContext('2d');
 
+const screenshotCanvas = document.getElementById('my-screenshot');
+const screenshotCanvasCtx = screenshotCanvas.getContext('2d');
+
 const scaledOverlayCanvas = document.getElementById('my-scaled-overlay');
 const scaledOverlayCanvasCtx = scaledOverlayCanvas.getContext('2d');
 
@@ -57,16 +60,39 @@ function saveCanvas(canvas, label, outFilePath) {
   });
 }
 
-function saveScreenshot(outFilePath) {
+function saveScreenshot(detectionResult, outFilePath) {
   screenshot({
     format: 'png',
     filename: `${outFilePath}_screen.png`
+  }).then((imgPath) => {
+    const mSreenShot = new Image();
+    mSreenShot.src = imgPath;
+    mSreenShot.onload = function() {
+      screenshotCanvas.width = mSreenShot.width / 2;
+      screenshotCanvas.height = mSreenShot.height / 2;
+      screenshotCanvasCtx.drawImage(mSreenShot, 0, 0, screenshotCanvas.width, screenshotCanvas.height);
+      drawCenteredFace(screenshotCanvas, screenshotCanvasCtx, detectionResult);
+      saveCanvas(screenshotCanvas, 'center', outFilePath);
+    };
   });
 }
 
 function updateCanvases() {
   snapshotCanvasCtx.clearRect(0, 0, snapshotCanvas.width, snapshotCanvas.height);
   snapshotCanvasCtx.drawImage(myCamera, 0, 0);
+}
+
+function drawCenteredFace(canvas, ctx, detectionResult) {
+  const mbox = detectionResult.detection.box;
+  const ndims = {};
+
+  ndims.width = Math.min(mbox.width, 0.2 * canvas.width);
+  ndims.height = ndims.width * mbox.height / mbox.width;
+  ndims.x = 0.5 * (canvas.width - ndims.width);
+  ndims.y = 0.5 * (canvas.height - ndims.height);
+
+  ctx.drawImage(snapshotCanvas, mbox.x, mbox.y, mbox.width, mbox.height,
+                ndims.x, ndims.y, ndims.width, ndims.height);
 }
 
 function saveCanvases(detectionResult, detectionResultScaled, faceapi) {
@@ -80,7 +106,7 @@ function saveCanvases(detectionResult, detectionResultScaled, faceapi) {
   faceapi.draw.drawFaceExpressions(snapshotCanvas, detectionResult);
   saveCanvas(snapshotCanvas, 'labeld', outUris.outFilePath);
 
-  saveScreenshot(outUris.outFilePath);
+  saveScreenshot(detectionResult, outUris.outFilePath);
 
   // preview overlay
   // scaledOverlayCanvasCtx.clearRect(0, 0, scaledOverlayCanvas.width, scaledOverlayCanvas.height);
