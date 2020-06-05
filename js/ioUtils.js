@@ -28,7 +28,7 @@ const mDate = moment().format('YYYY-MM-DD');
 const outInfo = {};
 
 function setOutDir() {
-  outInfo.outDirName = mDate + '_' + parseInt(moment().format('x')).toString(32);
+  outInfo.outDirName = mDate + '_' + moment().format('HHmmss');
   outInfo.outDirPath = pathJoin(getAppPath(), outInfo.outDirName);
 }
 
