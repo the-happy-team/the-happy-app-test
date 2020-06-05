@@ -84,15 +84,24 @@ function updateCanvases() {
 
 function drawCenteredFace(canvas, ctx, detectionResult) {
   const mbox = detectionResult.detection.box;
-  const ndims = {};
+  const padding = 0.5 * mbox.width;
+  const dims = {
+    src: {},
+    dst: {}
+  };
 
-  ndims.width = Math.min(mbox.width, 0.2 * canvas.width);
-  ndims.height = ndims.width * mbox.height / mbox.width;
-  ndims.x = 0.5 * (canvas.width - ndims.width);
-  ndims.y = 0.5 * (canvas.height - ndims.height);
+  dims.src.x = mbox.x - padding;
+  dims.src.y = mbox.y - padding;
+  dims.src.width = mbox.width + 2 * padding;
+  dims.src.height = mbox.height + 2 * padding;
 
-  ctx.drawImage(snapshotCanvas, mbox.x, mbox.y, mbox.width, mbox.height,
-                ndims.x, ndims.y, ndims.width, ndims.height);
+  dims.dst.width = Math.min(dims.src.width, 0.2 * canvas.width);
+  dims.dst.height = dims.dst.width * dims.src.height / dims.src.width;
+  dims.dst.x = 0.5 * (canvas.width - dims.dst.width);
+  dims.dst.y = 0.5 * (canvas.height - dims.dst.height);
+
+  ctx.drawImage(snapshotCanvas, dims.src.x, dims.src.y, dims.src.width, dims.src.height,
+                dims.dst.x, dims.dst.y, dims.dst.width, dims.dst.height);
 }
 
 function saveCanvases(detectionResult, detectionResultScaled, faceapi) {
