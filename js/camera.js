@@ -93,6 +93,7 @@ loadNet().then(() => {
   return initCamera(CAM.WIDTH, CAM.HEIGHT);
 }).then(video => {
   console.log('Camera was initialized');
+  document.getElementById('start-button').classList.remove('hide');
   setupCanvases(CAM.WIDTH, CAM.HEIGHT);
   cam = video;
 });
