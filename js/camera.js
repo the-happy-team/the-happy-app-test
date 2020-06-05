@@ -96,6 +96,11 @@ loadNet().then(() => {
   document.getElementById('start-button').classList.remove('hide');
   setupCanvases(CAM.WIDTH, CAM.HEIGHT);
   cam = video;
+  const delinput = document.getElementById('my-delay-input');
+  delinput.addEventListener('keyup', function() {
+    const nDelaySec = Math.max(1, parseInt(delinput.value) || 1);
+    DELAY.LONG = nDelaySec * 1000;
+  });
 });
 
 module.exports = { detectFace };
