@@ -1,6 +1,6 @@
 const { app, dialog } = require('electron').remote;
 const { createWriteStream, writeFileSync } = require('fs');
-const { clearCanvases, setOutDir, getUris } = require('./js/ioUtils');
+const { clearCanvases, setOutDir, getUris, resetPhotoCounter } = require('./js/ioUtils');
 const { detectFace } = require('./js/camera');
 
 const pathResolve = require('path').resolve;
@@ -68,6 +68,7 @@ document.getElementById('start-button').addEventListener('click', function() {
   this.innerHTML = window.appRunning ? 'Pausar' : 'Iniciar';
 
   if(window.appRunning) {
+    resetPhotoCounter();
     setOutDir();
     detectFace();
   } else {

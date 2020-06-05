@@ -17,6 +17,9 @@ const scaledOverlayCanvasCtx = scaledOverlayCanvas.getContext('2d');
 
 const myCamera = document.getElementById('my-cam');
 
+const myCounterDiv = document.getElementById('my-photo-counter');
+let photoCount = 0;
+
 function setupCanvases(width, height) {
   snapshotCanvas.width = width;
   snapshotCanvas.height = height;
@@ -26,6 +29,11 @@ function setupCanvases(width, height) {
 
 const mDate = moment().format('YYYY-MM-DD');
 const outInfo = {};
+
+function resetPhotoCounter() {
+  photoCount = 0;
+  myCounterDiv.innerHTML = `${(photoCount)} fotos`;
+}
 
 function setOutDir() {
   outInfo.outDirName = mDate + '_' + moment().format('HHmmss');
@@ -105,6 +113,8 @@ function drawCenteredFace(canvas, ctx, detectionResult) {
 }
 
 function saveCanvases(detectionResult, detectionResultScaled, faceapi) {
+  myCounterDiv.innerHTML = `${(++photoCount)} fotos`;
+
   const outUris = getUris();
 
   // original picture  
@@ -128,4 +138,4 @@ function clearCanvases() {
   scaledOverlayCanvasCtx.clearRect(0, 0, scaledOverlayCanvas.width, scaledOverlayCanvas.height);
 }
 
-module.exports = { setupCanvases, updateCanvases, saveCanvases, clearCanvases, setOutDir, getUris };
+module.exports = { setupCanvases, updateCanvases, saveCanvases, clearCanvases, setOutDir, resetPhotoCounter, getUris };
