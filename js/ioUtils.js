@@ -1,8 +1,7 @@
 const { getAppPath } = require('electron').remote.app;
-const { writeFile } = require('fs');
+const { writeFile, mkdirSync } = require('fs');
 
 const pathJoin = require('path').join;
-const fs_jetpack = require('fs-jetpack');
 const moment = require('moment');
 const screenshot = require('screenshot-desktop');
 
@@ -43,7 +42,7 @@ function setOutDir() {
 function getUris() {
   outInfo.outFileName = moment().format('YYYYMMDD_HHmmss');
   outInfo.outFilePath = pathJoin(outInfo.outDirPath, outInfo.outFileName);
-  fs_jetpack.dir(outInfo.outDirPath);
+  mkdirSync(outInfo.outDirPath, { recursive: true });
   return outInfo;
 }
 
