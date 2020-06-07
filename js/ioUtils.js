@@ -26,6 +26,11 @@ function setupCanvases(width, height) {
   scaledOverlayCanvas.height = height / 2;
 }
 
+const drawOptions = {
+  lineWidth: 10,
+  boxColor: '#C7F440'
+};
+
 const mDate = moment().format('YYYY-MM-DD');
 const outInfo = {};
 
@@ -119,9 +124,9 @@ function saveCanvases(detectionResult, detectionResultScaled, faceapi) {
   // original picture  
   saveCanvas(snapshotCanvas, 'camera', outUris.outFilePath);
 
-  // labeled picture
-  faceapi.draw.drawDetections(snapshotCanvas, detectionResult);
-  faceapi.draw.drawFaceExpressions(snapshotCanvas, detectionResult);
+  const faceBox = new faceapi.draw.DrawBox(detectionResult.detection.box, drawOptions);
+  faceBox.draw(snapshotCanvas);
+
   saveCanvas(snapshotCanvas, 'labeld', outUris.outFilePath);
 
   saveScreenshot(detectionResult, outUris.outFilePath);
