@@ -1,7 +1,7 @@
 :root {
   --color-bg: #222;
-  --color-graph: #e0ffff;
-  --color-graph-hover: #f0ffff;
+  --color-fg: #C7F440;
+  --color-fg-hover: #eef4dc;
 }
 
 html, body {
@@ -34,13 +34,13 @@ html, body {
   padding: 12px 0 12px 12px;
   text-transform: uppercase;
   letter-spacing: .2em;
-  color: var(--color-graph);
+  color: var(--color-fg);
   text-align: left;
 }
 
 .graph-bar {
   padding-top: 12px;
-  background-color: var(--color-graph);
+  background-color: var(--color-fg);
 }
 
 .snapshot {
@@ -78,7 +78,7 @@ html, body {
   border-radius: 8px;
   cursor: pointer;
   color: var(--color-bg);
-  background-color: var(--color-graph);
+  background-color: var(--color-fg);
   text-transform: uppercase;
   font-family: sans-serif;
   font-weight: 100;
@@ -88,7 +88,7 @@ html, body {
 }
 
 .button:hover {
-  background-color: var(--color-graph-hover);
+  background-color: var(--color-fg-hover);
 }
 
 .button.hide {
@@ -99,7 +99,7 @@ html, body {
   width: 100%;
   text-align: center;
   font-size: 24px;
-  color: var(--color-graph);
+  color: var(--color-fg-hover);
 }
 
 .photo-delay {
