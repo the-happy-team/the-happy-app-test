@@ -70,7 +70,7 @@ document.getElementById('start-button').addEventListener('click', function() {
   if(window.appRunning) {
     resetPhotoCounter();
     setOutDir();
-    detectFace();
+    setTimeout(detectFace, 100);
   } else {
     clearCanvases();
     clearInterval(window.loopID);
