@@ -8,6 +8,7 @@ const pathJoin = require('path').join;
 const archiver = require('archiver');
 
 window.appRunning = false;
+window.zipSaved = false;
 window.loopID = 0;
 window.rawFeelings = {};
 window.feelings = {};
@@ -70,6 +71,7 @@ document.getElementById('start-button').addEventListener('click', function() {
   if(window.appRunning) {
     resetPhotoCounter();
     setOutDir();
+    window.zipSaved = false;
     setTimeout(detectFace, 100);
   } else {
     clearCanvases();
@@ -98,4 +100,6 @@ document.getElementById('save-button').addEventListener('click', function() {
   archive.pipe(output);
   archive.directory(outInfo.outDirPath, outInfo.outDirName);
   archive.finalize();
+
+  window.zipSaved = true;
 }, false);
