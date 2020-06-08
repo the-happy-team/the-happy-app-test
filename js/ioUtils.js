@@ -8,6 +8,9 @@ const screenshot = require('screenshot-desktop');
 const snapshotCanvas = document.getElementById('my-snapshot');
 const snapshotCanvasCtx = snapshotCanvas.getContext('2d');
 
+const snapshotLbCanvas = document.getElementById('my-snapshot-labeled');
+const snapshotLbCanvasCtx = snapshotLbCanvas.getContext('2d');
+
 const snapshotBwCanvas = document.getElementById('my-snapshot-bw');
 const snapshotBwCanvasCtx = snapshotBwCanvas.getContext('2d');
 
@@ -25,6 +28,8 @@ let photoCount = 0;
 function setupCanvases(width, height) {
   snapshotCanvas.width = width;
   snapshotCanvas.height = height;
+  snapshotLbCanvas.width = width;
+  snapshotLbCanvas.height = height;
   snapshotBwCanvas.width = width;
   snapshotBwCanvas.height = height;
   scaledOverlayCanvas.width = width / 2;
@@ -97,8 +102,8 @@ function saveScreenshot(outFilePath, detectionResult, faceBox) {
 function updateCanvases() {
   snapshotCanvasCtx.clearRect(0, 0, snapshotCanvas.width, snapshotCanvas.height);
   snapshotCanvasCtx.drawImage(myCamera, 0, 0);
-  snapshotBwCanvasCtx.clearRect(0, 0, snapshotBwCanvas.width, snapshotBwCanvas.height);
-  snapshotBwCanvasCtx.drawImage(myCamera, 0, 0);
+  snapshotLbCanvasCtx.drawImage(snapshotCanvas, 0, 0);
+  snapshotBwCanvasCtx.drawImage(snapshotCanvas, 0, 0);
 }
 
 function drawCenteredFace(canvas, detectionResult, faceBox) {
@@ -144,8 +149,8 @@ function saveCanvases(detectionResult, detectionResultScaled, faceapi) {
 
   // labeled pictured
   const faceBox = new faceapi.draw.DrawBox(detectionResult.detection.box, drawOptions);
-  faceBox.draw(snapshotCanvas);
-  saveCanvas(snapshotCanvas, 'labeld', outUris.outFilePath);
+  faceBox.draw(snapshotLbCanvas);
+  saveCanvas(snapshotLbCanvas, 'labeld', outUris.outFilePath);
 
   // screenshot
   saveScreenshot(outUris.outFilePath, detectionResult, faceBox);
@@ -158,6 +163,7 @@ function saveCanvases(detectionResult, detectionResultScaled, faceapi) {
 
 function clearCanvases() {
   snapshotCanvasCtx.clearRect(0, 0, snapshotCanvas.width, snapshotCanvas.height);
+  snapshotLbCanvasCtx.clearRect(0, 0, snapshotLbCanvas.width, snapshotLbCanvas.height);
   snapshotBwCanvasCtx.clearRect(0, 0, snapshotBwCanvas.width, snapshotBwCanvas.height);
   scaledOverlayCanvasCtx.clearRect(0, 0, scaledOverlayCanvas.width, scaledOverlayCanvas.height);
 }

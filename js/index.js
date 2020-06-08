@@ -66,13 +66,16 @@ document.getElementById('start-button').addEventListener('click', function() {
   document.getElementById('my-graph-container').style.opacity = window.appRunning ? '0' : '1';
   document.getElementById('save-button').style.display = window.appRunning ? 'none' : 'inline-block';
 
-  this.innerHTML = window.appRunning ? 'Pausar' : 'Iniciar';
+  this.innerHTML = window.appRunning ? 'Iniciando ... ' : 'Iniciar';
 
   if(window.appRunning) {
     resetPhotoCounter();
     setOutDir();
     window.zipSaved = false;
     setTimeout(detectFace, 100);
+    setTimeout(function() {
+      this.innerHTML = 'Pausar';
+    }.bind(this), 200);
   } else {
     clearCanvases();
     clearInterval(window.loopID);
