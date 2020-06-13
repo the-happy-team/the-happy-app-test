@@ -5,8 +5,10 @@ const path = require('path');
 
 const { saveCanvasFromFile } = require('./ioUtils');
 
+const myCounterDiv = document.getElementById('my-photo-counter');
+
 const faceapiOptions = new faceapi.SsdMobilenetv1Options({
-  minConfidence: 0.6,
+  minConfidence: 0.4,
   maxResults: 100
 });
 
@@ -25,20 +27,28 @@ const loadNet = async () => {
   await faceapi.loadFaceExpressionModel(path.join(getAppPath(), 'assets', 'weights'));
 };
 
-const detectFace = async (userDir) => {
-  
-  readdirSync(userDir).forEach((file) => {
-    // TODO: if not .png, return
 
+const detectFace = (userDir) => {
+  const files = [];
+  const imgs = [];
+  let currentIndex = 0;
+
+  readdirSync(userDir).forEach((file) => {
+    if (!(file.endsWith('.png') || file.endsWith('.jpg'))) return;
     const mImage = new Image();
+
+    files.push(file);
+    imgs.push(mImage);
+
     mImage.onload = async function() {
-      console.log('loaded:' + mImage.width + ' x ' + mImage.height);
+      currentIndex += 1;
+      myCounterDiv.innerHTML = `${(currentIndex)} fotos`;
+
       const mCanvas = document.createElement('canvas');
       const mCanvasCtx = mCanvas.getContext('2d');
       mCanvas.width = mImage.width;
       mCanvas.height = mImage.height;
       mCanvasCtx.drawImage(mImage, 0, 0);
-      //document.getElementsByTagName('body')[0].appendChild(mCanvas);
 
       const result = await faceapi.detectSingleFace(mCanvas, faceapiOptions).withFaceExpressions();
 
@@ -59,10 +69,16 @@ const detectFace = async (userDir) => {
         }
         window.feelings[mExpression] += 1;
       }
-    }
 
-    mImage.src = path.join(userDir, file);
+      if (currentIndex < files.length) {
+        imgs[currentIndex].src = path.join(userDir, files[currentIndex]);
+      } else {
+        // TODO: save zip
+      }
+    }
   });
+
+  imgs[currentIndex].src = path.join(userDir, files[currentIndex]);
 };
 
 loadNet().then(() => {
