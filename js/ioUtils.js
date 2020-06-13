@@ -74,10 +74,10 @@ function processBase64Image(dataString) {
   }
 }
 
-function saveCanvas(canvas, label, outFilePath) {
+function saveCanvas(canvas, outFile) {
   const imageBuffer = processBase64Image(canvas.toDataURL('image/png'));
 
-  writeFile(`${outFilePath}_${label}.png`, imageBuffer.data, 'binary', function(err) {
+  writeFile(outFile, imageBuffer.data, 'binary', function(err) {
     if(err) console.log(err);
   });
 }
@@ -94,7 +94,7 @@ function saveScreenshot(outFilePath, detectionResult, faceBox) {
       screenshotCanvas.height = mSreenShot.height / 2;
       screenshotCanvasCtx.drawImage(mSreenShot, 0, 0, screenshotCanvas.width, screenshotCanvas.height);
       drawCenteredFace(screenshotCanvas, detectionResult, faceBox);
-      saveCanvas(screenshotCanvas, 'scrcam', outFilePath);
+      saveCanvas(screenshotCanvas, `${outFilePath}_scrcam.png`);
     };
   });
 }
@@ -144,13 +144,13 @@ function saveCanvases(detectionResult, detectionResultScaled, faceapi) {
 
   const outUris = getUris();
 
-  // original picture  
-  saveCanvas(snapshotCanvas, 'camera', outUris.outFilePath);
+  // original picture
+  saveCanvas(snapshotCanvas, `${outUris.outFilePath}_camera.png`);
 
   // labeled pictured
   const faceBox = new faceapi.draw.DrawBox(detectionResult.detection.box, drawOptions);
   faceBox.draw(snapshotLbCanvas);
-  saveCanvas(snapshotLbCanvas, 'labeld', outUris.outFilePath);
+  saveCanvas(snapshotLbCanvas, `${outUris.outFilePath}_labeld.png`);
 
   // screenshot
   saveScreenshot(outUris.outFilePath, detectionResult, faceBox);
@@ -161,6 +161,16 @@ function saveCanvases(detectionResult, detectionResultScaled, faceapi) {
   // faceapi.draw.drawFaceExpressions(scaledOverlayCanvas, detectionResultScaled);
 }
 
+function saveCanvasFromFile(detectionResult, faceapi, mCanvas, fname) {
+  const outUris = getUris();
+  const outfile = pathJoin(outUris.outDirPath, `${fname}_labeld.png`);
+
+  const faceBox = new faceapi.draw.DrawBox(detectionResult.detection.box, drawOptions);
+  faceBox.draw(mCanvas);
+
+  saveCanvas(mCanvas, outfile);
+}
+
 function clearCanvases() {
   snapshotCanvasCtx.clearRect(0, 0, snapshotCanvas.width, snapshotCanvas.height);
   snapshotLbCanvasCtx.clearRect(0, 0, snapshotLbCanvas.width, snapshotLbCanvas.height);
@@ -168,4 +178,13 @@ function clearCanvases() {
   scaledOverlayCanvasCtx.clearRect(0, 0, scaledOverlayCanvas.width, scaledOverlayCanvas.height);
 }
 
-module.exports = { setupCanvases, updateCanvases, saveCanvases, clearCanvases, setOutDir, resetPhotoCounter, getUris };
+module.exports = {
+  setupCanvases,
+  updateCanvases,
+  saveCanvases,
+  saveCanvasFromFile,
+  clearCanvases,
+  setOutDir,
+  resetPhotoCounter,
+  getUris
+};

@@ -1,5 +1,4 @@
 const { getAppPath } = require('electron').remote.app;
-const electron = require('electron');
 const faceapi = require('face-api.js');
 const path = require('path');
 
@@ -94,6 +93,7 @@ loadNet().then(() => {
 }).then(video => {
   console.log('Camera was initialized');
   document.getElementById('start-button').classList.remove('hide');
+  document.getElementById('load-button').classList.remove('hide');
   setupCanvases(CAM.WIDTH, CAM.HEIGHT);
   cam = video;
   const delayInput = document.getElementById('my-delay-input');

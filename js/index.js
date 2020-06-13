@@ -1,7 +1,8 @@
 const { app, dialog } = require('electron').remote;
 const { createWriteStream, writeFileSync } = require('fs');
 const { clearCanvases, setOutDir, getUris, resetPhotoCounter } = require('./js/ioUtils');
-const { detectFace } = require('./js/camera');
+const detectFaceCamera = require('./js/camera').detectFace;
+const detectFaceFiles = require('./js/files').detectFace;
 
 const pathResolve = require('path').resolve;
 const pathJoin = require('path').join;
@@ -67,12 +68,13 @@ document.getElementById('start-button').addEventListener('click', function() {
   document.getElementById('save-button').style.display = window.appRunning ? 'none' : 'inline-block';
 
   this.innerHTML = window.appRunning ? 'Iniciando ... ' : 'Iniciar';
+  document.getElementById('load-button').classList.add('hide');
 
   if(window.appRunning) {
     resetPhotoCounter();
     setOutDir();
     window.zipSaved = false;
-    setTimeout(detectFace, 100);
+    setTimeout(detectFaceCamera, 100);
     setTimeout(function() {
       this.innerHTML = 'Pausar';
     }.bind(this), 200);
@@ -105,4 +107,16 @@ document.getElementById('save-button').addEventListener('click', function() {
   archive.finalize();
 
   window.zipSaved = true;
+}, false);
+
+document.getElementById('load-button').addEventListener('click', function() {
+  setOutDir();
+  const outInfo = getUris();
+
+  const userChosenPath = dialog.showOpenDialogSync({
+    defaultPath: pathResolve(app.getPath('documents')),
+    properties: ['openDirectory']
+  });
+
+  detectFaceFiles(userChosenPath[0]);
 }, false);
