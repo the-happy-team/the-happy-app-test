@@ -74,6 +74,8 @@ document.getElementById('start-button').addEventListener('click', function() {
     resetPhotoCounter();
     setOutDir();
     window.zipSaved = false;
+    window.rawFeelings = {};
+    window.feelings = {};
     setTimeout(detectFaceCamera, 100);
     setTimeout(function() {
       this.innerHTML = 'Pausar';
@@ -112,6 +114,13 @@ document.getElementById('save-button').addEventListener('click', function() {
 document.getElementById('load-button').addEventListener('click', function() {
   setOutDir();
   const outInfo = getUris();
+
+  document.getElementById('start-button').classList.add('hide');
+  document.getElementById('load-button').classList.add('hide');
+  document.getElementById('save-button').style.display = 'none';
+  window.zipSaved = false;
+  window.feelings = {};
+  window.rawFeelings = {};
 
   const userChosenPath = dialog.showOpenDialogSync({
     defaultPath: pathResolve(app.getPath('documents')),

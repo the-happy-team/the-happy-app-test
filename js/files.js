@@ -73,7 +73,8 @@ const detectFace = (userDir) => {
       if (currentIndex < files.length) {
         imgs[currentIndex].src = path.join(userDir, files[currentIndex]);
       } else {
-        // TODO: save zip
+        document.getElementById('save-button').style.display = window.appRunning ? 'none' : 'inline-block';
+        document.getElementById('load-button').classList.remove('hide');
       }
     }
   });
