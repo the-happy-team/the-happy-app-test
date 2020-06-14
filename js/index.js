@@ -48,17 +48,25 @@ function drawHappiness() {
 
   mCanvasCtx.fillRect(0, 0, mCanvas.width, mCanvas.height);
   mCanvasCtx.beginPath();
-  mCanvasCtx.moveTo(mX0 * mCanvas.width,
-                   mCanvas.height - mY0 * mCanvas.height);
+  mCanvasCtx.moveTo(mX0 * mCanvas.width, mCanvas.height - mY0 * mCanvas.height);
 
   for(let i = 1; i < window.happiness.values.length; i++) {
     const mX = (window.happiness.values[i][0] - xMin) / xRange;
     const mY = 0.8 * window.happiness.values[i][1] + 0.1;
-    mCanvasCtx.lineTo(mX * mCanvas.width,
-                      mCanvas.height - mY * mCanvas.height);
-  }
 
+    //mCanvasCtx.beginPath();
+    //mCanvasCtx.moveTo(mX * mCanvas.width, mCanvas.height - 0.1 * mCanvas.height);
+    mCanvasCtx.lineTo(mX * mCanvas.width, mCanvas.height - mY * mCanvas.height);
+    //mCanvasCtx.stroke();
+  }
   mCanvasCtx.stroke();
+
+  mCanvasCtx.beginPath();
+  mCanvasCtx.moveTo(mX0 * mCanvas.width, mCanvas.height - 0.05 * mCanvas.height);
+  mCanvasCtx.lineTo(1.0 * mCanvas.width, mCanvas.height - 0.05 * mCanvas.height);
+  mCanvasCtx.stroke();
+
+  //document.getElementsByTagName('body')[0].appendChild(mCanvas);
 
   return mCanvas;
 }
