@@ -1,6 +1,6 @@
 const { app, dialog } = require('electron').remote;
 const { createWriteStream, writeFileSync } = require('fs');
-const { clearCanvases, setOutDir, getUris, resetPhotoCounter } = require('./js/ioUtils');
+const { clearCanvases, setOutDir, getUris, resetPhotoCounter, saveCanvas } = require('./js/ioUtils');
 const detectFaceCamera = require('./js/camera').detectFace;
 const detectFaceFiles = require('./js/files').detectFace;
 
@@ -19,12 +19,48 @@ function resetHappinessCounter() {
   window.feelings = {};
 
   window.happiness = {
-    minTime: 0,
-    maxTime: 0,
     minHappy: 1e6,
     maxHappy: 0,
     values: []
   };
+}
+
+function drawHappiness() {
+  const bodyStyle = getComputedStyle(document.body);
+  const happyColor = bodyStyle.getPropertyValue('--color-fg');
+  const backgroundColor = '#1e3070'; //'#3d50a0'; //406df4
+
+  const xMin = window.happiness.values[0][0];
+  const xMax = window.happiness.values[window.happiness.values.length - 1][0];
+  const xRange =  xMax - xMin;
+
+  const mX0 = (window.happiness.values[0][0] - xMin) / xRange;
+  const mY0 = 0.8 * window.happiness.values[0][1] + 0.1;
+
+  const mCanvas = document.createElement('canvas');
+  const mCanvasCtx = mCanvas.getContext('2d');
+  mCanvas.width = 1280;
+  mCanvas.height = 720;
+
+  mCanvasCtx.fillStyle = backgroundColor;
+  mCanvasCtx.strokeStyle = happyColor;
+  mCanvasCtx.lineWidth = 2;
+
+  mCanvasCtx.fillRect(0, 0, mCanvas.width, mCanvas.height);
+  mCanvasCtx.beginPath();
+  mCanvasCtx.moveTo(mX0 * mCanvas.width,
+                   mCanvas.height - mY0 * mCanvas.height);
+
+  for(let i = 1; i < window.happiness.values.length; i++) {
+    const mX = (window.happiness.values[i][0] - xMin) / xRange;
+    const mY = 0.8 * window.happiness.values[i][1] + 0.1;
+    mCanvasCtx.lineTo(mX * mCanvas.width,
+                      mCanvas.height - mY * mCanvas.height);
+  }
+
+  mCanvasCtx.stroke();
+
+  return mCanvas;
 }
 
 function feelingsCsv(obj) {
@@ -111,7 +147,7 @@ document.getElementById('save-button').addEventListener('click', function() {
   });
 
   if (window.happiness.values.length > 0) {
-    // TODO: generate+save graph
+    saveCanvas(drawHappiness(), pathJoin(outInfo.outDirPath, '__happiness.png'));
   }
 
   const defaultPath = pathResolve(app.getPath('desktop'), `${outInfo.outDirName}.zip`);

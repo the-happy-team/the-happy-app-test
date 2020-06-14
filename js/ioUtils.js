@@ -186,5 +186,6 @@ module.exports = {
   clearCanvases,
   setOutDir,
   resetPhotoCounter,
-  getUris
+  getUris,
+  saveCanvas
 };
