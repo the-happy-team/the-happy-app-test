@@ -9,10 +9,23 @@ const pathJoin = require('path').join;
 const archiver = require('archiver');
 
 window.appRunning = false;
-window.zipSaved = false;
 window.loopID = 0;
-window.rawFeelings = {};
-window.feelings = {};
+
+
+function resetHappinessCounter() {
+  window.zipSaved = false;
+
+  window.rawFeelings = {};
+  window.feelings = {};
+
+  window.happiness = {
+    minTime: 0,
+    maxTime: 0,
+    minHappy: 1e6,
+    maxHappy: 0,
+    values: []
+  };
+}
 
 function feelingsCsv(obj) {
   let header = '';
@@ -67,15 +80,14 @@ document.getElementById('start-button').addEventListener('click', function() {
   document.getElementById('my-graph-container').style.opacity = window.appRunning ? '0' : '1';
   document.getElementById('save-button').style.display = window.appRunning ? 'none' : 'inline-block';
 
-  this.innerHTML = window.appRunning ? 'Iniciando ... ' : 'Iniciar';
+  this.innerHTML = window.appRunning ? 'Iniciando ... ' : 'Iniciar Camera';
   document.getElementById('load-button').classList.add('hide');
 
   if(window.appRunning) {
     resetPhotoCounter();
     setOutDir();
-    window.zipSaved = false;
-    window.rawFeelings = {};
-    window.feelings = {};
+    resetHappinessCounter();
+
     setTimeout(detectFaceCamera, 100);
     setTimeout(function() {
       this.innerHTML = 'Pausar';
@@ -98,6 +110,10 @@ document.getElementById('save-button').addEventListener('click', function() {
     if (err) throw err;
   });
 
+  if (window.happiness.values.length > 0) {
+    // TODO: generate+save graph
+  }
+
   const defaultPath = pathResolve(app.getPath('desktop'), `${outInfo.outDirName}.zip`);
   const userChosenPath = dialog.showSaveDialogSync({ defaultPath: defaultPath }) || `${outInfo.outDirPath}.zip`;
 
@@ -118,9 +134,8 @@ document.getElementById('load-button').addEventListener('click', function() {
   document.getElementById('start-button').classList.add('hide');
   document.getElementById('load-button').classList.add('hide');
   document.getElementById('save-button').style.display = 'none';
-  window.zipSaved = false;
-  window.feelings = {};
-  window.rawFeelings = {};
+
+  resetHappinessCounter();
 
   const userChosenPath = dialog.showOpenDialogSync({
     defaultPath: pathResolve(app.getPath('documents')),

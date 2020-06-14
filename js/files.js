@@ -68,6 +68,19 @@ const detectFace = (userDir) => {
           window.feelings[mExpression] = 0;
         }
         window.feelings[mExpression] += 1;
+
+        if (mExpression === 'happy') {
+          const mTime = currentIndex;
+          const mHappy = result.expressions['happy'];
+
+          if (window.happiness.minTime == 0) window.happiness.minTime = mTime;
+          if (mHappy < window.happiness.minHappy) window.happiness.minHappy = mHappy;
+          if (mHappy > window.happiness.maxHappy) window.happiness.maxHappy = mHappy;
+
+          window.happiness.maxTime = mTime;
+
+          window.happiness.values.push([mTime, mHappy]);
+        }
       }
 
       if (currentIndex < files.length) {

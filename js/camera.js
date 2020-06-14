@@ -1,6 +1,7 @@
 const { getAppPath } = require('electron').remote.app;
 const faceapi = require('face-api.js');
 const path = require('path');
+const moment = require('moment');
 
 const { setupCanvases, updateCanvases, saveCanvases } = require('./ioUtils');
 
@@ -80,6 +81,19 @@ const detectFace = async () => {
       window.feelings[mExpression] = 0;
     }
     window.feelings[mExpression] += 1;
+
+    if (mExpression === 'happy') {
+      const mTime = parseInt(moment().format('x'));
+      const mHappy = result.expressions['happy'];
+
+      if (window.happiness.minTime == 0) window.happiness.minTime = mTime;
+      if (mHappy < window.happiness.minHappy) window.happiness.minHappy = mHappy;
+      if (mHappy > window.happiness.maxHappy) window.happiness.maxHappy = mHappy;
+
+      window.happiness.maxTime = mTime;
+
+      window.happiness.values.push([mTime, mHappy]);
+    }
 
     window.loopID = setTimeout(detectFace, DELAY.LONG);
   } else {
