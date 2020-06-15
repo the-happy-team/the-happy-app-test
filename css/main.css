@@ -1,7 +1,8 @@
 :root {
   --color-bg: #222;
+  --color-bg-graph: #1E3070;
   --color-fg: #C7F440;
-  --color-fg-hover: #eef4dc;
+  --color-fg-hover: #EEf4DC;
 }
 
 html, body {

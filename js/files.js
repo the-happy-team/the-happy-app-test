@@ -55,29 +55,21 @@ const detectFace = (userDir) => {
       if(typeof result !== 'undefined') {
         saveCanvasFromFile(result, faceapi, mCanvas, file.replace('.png', ''));
 
-        const mExpression = Object.keys(result.expressions).reduce((a, b) => {
-          if(!(b in window.rawFeelings)) {
-            window.rawFeelings[b] = 0;
-          }
-          window.rawFeelings[b] += result.expressions[b];
+        window.feelingsRaw.header.forEach((e) => {
+          const mVal = result.expressions[e];
+          if (mVal < window.feelingsRaw.minVals[e]) window.feelingsRaw.minVals[e] = mVal;
+          if (mVal > window.feelingsRaw.maxVals[e]) window.feelingsRaw.maxVals[e] = mVal;
+          window.feelingsRaw.values[e].push(mVal || currentIndex);
+        });
 
+        const mExpression = Object.keys(result.expressions).reduce((a, b) => {
           return (result.expressions[a] > result.expressions[b]) ? a : b;
         }, -1);
 
-        if(!(mExpression in window.feelings)) {
-          window.feelings[mExpression] = 0;
+        if(!(mExpression in window.feelingsCounter)) {
+          window.feelingsCounter[mExpression] = 0;
         }
-        window.feelings[mExpression] += 1;
-
-        if (mExpression === 'happy') {
-          const mTime = currentIndex;
-          const mHappy = result.expressions['happy'];
-
-          if (mHappy < window.happiness.minHappy) window.happiness.minHappy = mHappy;
-          if (mHappy > window.happiness.maxHappy) window.happiness.maxHappy = mHappy;
-
-          window.happiness.values.push([mTime, mHappy]);
-        }
+        window.feelingsCounter[mExpression] += 1;
       }
 
       if (currentIndex < files.length) {

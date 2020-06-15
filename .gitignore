@@ -4,6 +4,7 @@ node_modules
 *_camera.png
 *_labeld.png
 *_scrcam.png
-__*feelings*csv
-__happiness*.png
+__*csv
+__*json
+_graph-*.png
 Happy-darwin-x64*

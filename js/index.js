@@ -15,27 +15,36 @@ window.loopID = 0;
 function resetHappinessCounter() {
   window.zipSaved = false;
 
-  window.rawFeelings = {};
-  window.feelings = {};
-
-  window.happiness = {
-    minHappy: 1e6,
-    maxHappy: 0,
-    values: []
+  window.feelingsRaw = {
+    header: ['angry', 'disgusted', 'fearful', 'happy', 'neutral', 'sad', 'surprised', 'time'],
+    values: {},
+    minVals: {},
+    maxVals:{}
   };
+
+  window.feelingsRaw.header.forEach((e) => {
+    window.feelingsRaw.minVals[e] = 1e6;
+    window.feelingsRaw.maxVals[e] = 0;
+    window.feelingsRaw.values[e] = [];
+  });
+
+  window.feelingsCounter = {};
 }
 
-function drawHappiness() {
+function drawEmotion(mEmotion) {
   const bodyStyle = getComputedStyle(document.body);
   const happyColor = bodyStyle.getPropertyValue('--color-fg');
-  const backgroundColor = '#1e3070'; //'#3d50a0'; //406df4
+  const backgroundColor = bodyStyle.getPropertyValue('--color-bg-graph');
 
-  const xMin = window.happiness.values[0][0];
-  const xMax = window.happiness.values[window.happiness.values.length - 1][0];
-  const xRange =  xMax - xMin;
+  const mTime = window.feelingsRaw.values['time'];
+  const mVals = window.feelingsRaw.values[mEmotion];
 
-  const mX0 = (window.happiness.values[0][0] - xMin) / xRange;
-  const mY0 = 0.8 * window.happiness.values[0][1] + 0.1;
+  const xMin = mTime[0];
+  const xMax = mTime[mTime.length - 1];
+  const xRange = xMax - xMin;
+
+  const mX0 = 0;
+  const mY0 = 0.8 * mVals[0] + 0.1;
 
   const mCanvas = document.createElement('canvas');
   const mCanvasCtx = mCanvas.getContext('2d');
@@ -50,20 +59,16 @@ function drawHappiness() {
   mCanvasCtx.beginPath();
   mCanvasCtx.moveTo(mX0 * mCanvas.width, mCanvas.height - mY0 * mCanvas.height);
 
-  for(let i = 1; i < window.happiness.values.length; i++) {
-    const mX = (window.happiness.values[i][0] - xMin) / xRange;
-    const mY = 0.8 * window.happiness.values[i][1] + 0.1;
-
-    //mCanvasCtx.beginPath();
-    //mCanvasCtx.moveTo(mX * mCanvas.width, mCanvas.height - 0.1 * mCanvas.height);
+  for(let i = 1; i < mVals.length; i++) {
+    const mX = (mTime[i] - xMin) / xRange;
+    const mY = 0.8 * mVals[i] + 0.1;
     mCanvasCtx.lineTo(mX * mCanvas.width, mCanvas.height - mY * mCanvas.height);
-    //mCanvasCtx.stroke();
   }
   mCanvasCtx.stroke();
 
   mCanvasCtx.beginPath();
-  mCanvasCtx.moveTo(mX0 * mCanvas.width, mCanvas.height - 0.05 * mCanvas.height);
-  mCanvasCtx.lineTo(1.0 * mCanvas.width, mCanvas.height - 0.05 * mCanvas.height);
+  mCanvasCtx.moveTo(mX0 * mCanvas.width, mCanvas.height - 0.1 * mCanvas.height);
+  mCanvasCtx.lineTo(1.0 * mCanvas.width, mCanvas.height - 0.1 * mCanvas.height);
   mCanvasCtx.stroke();
 
   //document.getElementsByTagName('body')[0].appendChild(mCanvas);
@@ -85,12 +90,12 @@ function drawFeelingsGraph() {
   const graphDiv = document.getElementById('my-graph-container');
   graphDiv.innerHTML = '';
 
-  const total = Object.keys(window.feelings).reduce((acc, val) => {
-    return acc + window.feelings[val];
+  const total = Object.keys(window.feelingsCounter).reduce((acc, val) => {
+    return acc + window.feelingsCounter[val];
   }, 0);
 
-  const inOrder = Object.keys(window.feelings).sort((a, b) => {
-    return window.feelings[b] - window.feelings[a];
+  const inOrder = Object.keys(window.feelingsCounter).sort((a, b) => {
+    return window.feelingsCounter[b] - window.feelingsCounter[a];
   });
 
   inOrder.forEach((v) => {
@@ -98,7 +103,7 @@ function drawFeelingsGraph() {
     const mLabel = document.createElement('div');
     const mBar = document.createElement('div');
 
-    const pctValue = window.feelings[v] / total;
+    const pctValue = window.feelingsCounter[v] / total;
     const pctLabel = Math.floor(pctValue * 100);
     const pctWidth = Math.floor(pctValue * 83);
 
@@ -146,17 +151,19 @@ document.getElementById('start-button').addEventListener('click', function() {
 document.getElementById('save-button').addEventListener('click', function() {
   const outInfo = getUris();
 
-  writeFileSync(pathJoin(outInfo.outDirPath, '__feelings.csv'), feelingsCsv(window.feelings), (err) => {
+  writeFileSync(pathJoin(outInfo.outDirPath, '__counter.csv'), feelingsCsv(window.feelingsCounter), (err) => {
     if (err) throw err;
   });
 
-  writeFileSync(pathJoin(outInfo.outDirPath, '__feelings-raw.csv'), feelingsCsv(window.rawFeelings), (err) => {
+  writeFileSync(pathJoin(outInfo.outDirPath, '__values.json'), JSON.stringify(window.feelingsRaw), (err) => {
     if (err) throw err;
   });
 
-  if (window.happiness.values.length > 0) {
-    saveCanvas(drawHappiness(), pathJoin(outInfo.outDirPath, '__happiness.png'));
-  }
+  window.feelingsRaw.header.forEach((e) => {
+    if(e !== 'time' && window.feelingsRaw.values[e].length > 0) {
+      saveCanvas(drawEmotion(e), pathJoin(outInfo.outDirPath, `_graph-${e}.png`));
+    }
+  });
 
   const defaultPath = pathResolve(app.getPath('desktop'), `${outInfo.outDirName}.zip`);
   const userChosenPath = dialog.showSaveDialogSync({ defaultPath: defaultPath }) || `${outInfo.outDirPath}.zip`;
