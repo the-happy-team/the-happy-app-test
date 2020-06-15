@@ -60,6 +60,8 @@ const initCamera = async (width, height) => {
 };
 
 const detectFace = async () => {
+  if (!window.appRunning) return;
+
   updateCanvases();
   const result = await faceapi.detectSingleFace(cam, faceapiOptions).withFaceExpressions();
 
@@ -82,17 +84,14 @@ const detectFace = async () => {
     }
     window.feelings[mExpression] += 1;
 
-    const mTime = parseInt(moment().format('x'));
     if (mExpression === 'happy') {
+      const mTime = parseInt(moment().format('x'));
       const mHappy = result.expressions['happy'];
 
       if (mHappy < window.happiness.minHappy) window.happiness.minHappy = mHappy;
       if (mHappy > window.happiness.maxHappy) window.happiness.maxHappy = mHappy;
 
       window.happiness.values.push([mTime, mHappy]);
-    } else {
-      // TODO: think about this
-      window.happiness.values.push([mTime, 0]);
     }
 
     window.loopID = setTimeout(detectFace, DELAY.LONG);

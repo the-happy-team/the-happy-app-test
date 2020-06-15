@@ -69,17 +69,14 @@ const detectFace = (userDir) => {
         }
         window.feelings[mExpression] += 1;
 
-        const mTime = currentIndex;
         if (mExpression === 'happy') {
+          const mTime = currentIndex;
           const mHappy = result.expressions['happy'];
 
           if (mHappy < window.happiness.minHappy) window.happiness.minHappy = mHappy;
           if (mHappy > window.happiness.maxHappy) window.happiness.maxHappy = mHappy;
 
           window.happiness.values.push([mTime, mHappy]);
-        } else {
-          // TODO: think about this
-          window.happiness.values.push([mTime, 0]);
         }
       }
 
