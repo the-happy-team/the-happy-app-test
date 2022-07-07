@@ -12,7 +12,7 @@
     "archiver": "^4.0.1",
     "face-api.js": "^0.22.2",
     "fs": "^0.0.1-security",
-    "moment": "^2.20.1",
+    "moment": "^2.29.4",
     "screenshot-desktop": "^1.12.0"
   },
   "devDependencies": {
