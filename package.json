@@ -6,7 +6,7 @@
   "scripts": {
     "start": "electron .",
     "pack": "npm run pack-osx",
-    "pack-osx": "electron-packager . the-happy-app --out=release --overwrite --platform=darwin --arch=x64 --icon=icons/Happy.icns --prune=true --ignore=\"([0-9]{4}-[0-9]{2}-[0-9]{2})|release|feelings|icons|.gitignore|.travis.yml\" "
+    "pack-osx": "electron-packager . the-happy-app-test --out=release --overwrite --platform=darwin --arch=x64 --icon=icons/Happy.icns --prune=true --ignore=\"([0-9]{4}-[0-9]{2}-[0-9]{2})|release|feelings|icons|.gitignore|.travis.yml\" "
   },
   "dependencies": {
     "archiver": "^5.3.1",

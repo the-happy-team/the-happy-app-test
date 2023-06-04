@@ -31,11 +31,11 @@ jobs:
 
       - name: Pack
         run: |
-          mv release/the-happy-app-darwin-x64 ./the-happy-app-mac
-          tar -czf the-happy-app-mac.tar.gz the-happy-app-mac
+          mv release/the-happy-app-test-darwin-x64 ./the-happy-app-test-mac
+          tar -czf the-happy-app-test-mac.tar.gz the-happy-app-test-mac
 
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          files: the-happy-app-mac.tar.gz
+          files: the-happy-app-test-mac.tar.gz
           tag_name: ${{ steps.setup.outputs.TAG_NAME }}
