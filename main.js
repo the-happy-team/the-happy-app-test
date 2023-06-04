@@ -1,4 +1,4 @@
-const {app, BrowserWindow} = require('electron');
+const { app, BrowserWindow, systemPreferences } = require('electron');
 const path = require('path');
 const url = require('url');
 
@@ -7,7 +7,6 @@ const url = require('url');
 let win;
 
 function createWindow () {
-    // Create the browser window.
     win = new BrowserWindow({
       width: 1280,
       height: 720,
@@ -17,23 +16,21 @@ function createWindow () {
       icon: path.join(__dirname, 'icons', '256x256.png')
     });
 
-    // and load the index.html of the app.
     win.loadURL(url.format({
         pathname: path.join(__dirname, 'index.html'),
         protocol: 'file:',
         slashes: true
     }));
 
-    // Open the DevTools.
     win.webContents.openDevTools();
 
-    // Emitted when the window is closed.
     win.on('closed', () => {
-        // Dereference the window object, usually you would store windows
-        // in an array if your app supports multi windows, this is the time
-        // when you should delete the corresponding element.
         win = null
-    })
+    });
+
+    if (systemPreferences.askForMediaAccess) {
+        systemPreferences.askForMediaAccess("camera");
+    }
 }
 
 // This method will be called when Electron has finished
